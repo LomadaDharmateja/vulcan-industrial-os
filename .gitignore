@@ -1,0 +1,13 @@
+# Security
+.env
+
+# Python Virtual Environment
+venv/
+__pycache__/
+*.pyc
+
+# Database and ML Models (Optional, but good practice to exclude huge files)
+# Note: If your .db and .pkl are small enough, you can leave these commented out
+# data/*.db 
+# models/*.pkl
+# data/chroma_db/

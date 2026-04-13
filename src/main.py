@@ -13,8 +13,22 @@ from langchain_classic.memory import ConversationBufferMemory
 
 load_dotenv()
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger("IndustrialAI")
+import logging
+import os
+
+# 1. Create the logs folder automatically if it doesn't exist
+os.makedirs('logs', exist_ok=True)
+
+# 2. Professional Log Configuration
+logging.basicConfig(
+    filename='logs/factory_brain.log',
+    level=logging.INFO,
+    format='%(asctime)s | %(name)s | %(levelname)s | %(message)s'
+)
+logger = logging.getLogger("VULCAN")
+
+# Inside your IndustrialAI class __init__, you can log that it started:
+# logger.info("VULCAN AI Brain initialized successfully.")
 
 class IndustrialAI:
     def __init__(self):

@@ -9,6 +9,11 @@ on:
 jobs:
   test_and_build:
     runs-on: ubuntu-latest
+    # --- THE FIX: Give the pipeline permission to upload ---
+    permissions:
+      contents: read
+      packages: write
+    # -------------------------------------------------------
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4

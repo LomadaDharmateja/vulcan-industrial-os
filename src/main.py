@@ -41,6 +41,7 @@ class IndustrialAI:
         self.llm = ChatGoogleGenerativeAI(
             model="gemini-2.5-flash-lite", 
             google_api_key=os.getenv("GOOGLE_API_KEY")
+            temperature=0.7
         )
         # 1. Define the Tools available to the AI
         self.tools = [analyze_sensor_trends, check_maintenance_sensors, check_market_prices, consult_technical_manual, run_sql_query, get_market_news, predict_failure]

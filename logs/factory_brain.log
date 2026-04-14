@@ -1,0 +1,7 @@
+2026-04-14 19:25:08,875 | VULCAN | INFO | Industrial AI Brain initialized successfully.
+2026-04-14 19:28:25,828 | google_genai.models | INFO | AFC is enabled with max remote calls: 10.
+2026-04-14 19:28:27,779 | httpx | INFO | HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent "HTTP/1.1 503 Service Unavailable"
+2026-04-14 19:28:27,779 | google_genai._api_client | INFO | Retrying google.genai._api_client.BaseApiClient._request_once in 1.33 seconds as it raised ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}.
+2026-04-14 19:28:33,618 | httpx | INFO | HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent "HTTP/1.1 503 Service Unavailable"
+2026-04-14 19:28:33,619 | google_genai._api_client | INFO | Retrying google.genai._api_client.BaseApiClient._request_once in 2.79 seconds as it raised ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}.
+2026-04-14 19:28:49,084 | httpx | INFO | HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent "HTTP/1.1 200 OK"

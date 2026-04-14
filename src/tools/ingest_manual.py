@@ -1,34 +1,56 @@
 import os
+from dotenv import load_dotenv
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import Chroma
+from langchain_pinecone import PineconeVectorStore
 
-# 1. Load the PDF
-PDF_PATH = "data/WEG-WMO-Installation-Operation-and-Maintenance-Manual-of-Electric-Motors.pdf"
-DB_DIR = "data/chroma_db"
+# 1. Load the API keys from your local .env file
+load_dotenv()
 
-def index_manual():
-    print("📖 Reading the WEG Motor Manual...")
-    loader = PyPDFLoader(PDF_PATH)
-    docs = loader.load()
+PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
+HUGGINGFACE_API_KEY = os.getenv("HUGGINGFACE_API_KEY")
 
-    # 2. Split the text into manageable chunks
-    # We use 1000 characters with a small overlap so no info is lost in the "cracks"
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
-    chunks = text_splitter.split_documents(docs)
+if not PINECONE_API_KEY or not HUGGINGFACE_API_KEY:
+    raise ValueError("Missing API Keys! Check your .env file.")
 
-    # 3. Create Embeddings (This uses your RTX 3050 Ti's power!)
-    print("🧠 Turning text into vectors (Local Embedding)...")
-    embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+def ingest_document():
+    print("🚀 Starting Offline Ingestion Pipeline...")
 
-    # 4. Save to ChromaDB
-    vector_db = Chroma.from_documents(
+    # 2. Load the WEG Manual
+    # (Make sure this filename matches exactly what is in your data folder!)
+    file_path = "data/WEG-WMO-Installation-Operation-and-Maintenance-Manual-of-Electric-Motors.pdf"
+    print(f"📄 Loading manual from {file_path}...")
+    loader = PyPDFLoader(file_path)
+    documents = loader.load()
+
+    # 3. Chunk the text so the AI can read it in pieces
+    print("✂️ Splitting document into chunks...")
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=1000,
+        chunk_overlap=100
+    )
+    chunks = text_splitter.split_documents(documents)
+    print(f"✅ Created {len(chunks)} chunks.")
+
+    # 4. Connect to HuggingFace Cloud API (0MB local RAM used!)
+    print("🧠 Connecting to HuggingFace Inference API...")
+    embeddings = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-MiniLM-L6-v2"
+    )
+
+    # 5. Upload the converted numbers directly to Pinecone
+    print("☁️ Uploading vectors to Pinecone database... (This might take a minute)")
+    index_name = "vulcan-manuals"
+
+    PineconeVectorStore.from_documents(
         documents=chunks,
         embedding=embeddings,
-        persist_directory=DB_DIR
+        index_name=index_name
     )
-    print(f"✅ Success! Manual indexed into {DB_DIR}")
+    print("🎉 Ingestion Complete! The AI Brain is now safely in the cloud.")
 
 if __name__ == "__main__":
-    index_manual()
+    # Note: We use a relative path trick so you can run it from the root folder
+    # If the file path fails, adjust the '../data' to just 'data' depending on where you run it.
+    ingest_document()

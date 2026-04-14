@@ -1,21 +1,21 @@
 import os
-from langchain_community.document_loaders import PyPDFLoader
-from langchain_community.vectorstores import Chroma
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
+from langchain_pinecone import PineconeVectorStore
 
-# This uses your NVIDIA GPU to turn text into math!
-embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-
-def build_knowledge_base(pdf_path):
-    """Loads a PDF and saves it into a local Vector Database."""
-    loader = PyPDFLoader(pdf_path)
-    pages = loader.load_and_split()
+def get_vectorstore():
+    """Connects to the Pinecone cloud database."""
     
-    # Create the database locally on your disk
-    vector_db = Chroma.from_documents(
-        documents=pages, 
-        embedding=embeddings, 
-        persist_directory="./chroma_db"
+    # 1. Use the API for lightweight queries (0MB RAM!)
+    embeddings = HuggingFaceInferenceAPIEmbeddings(
+        api_key=os.getenv("HUGGINGFACE_API_KEY"),
+        model_name="sentence-transformers/all-MiniLM-L6-v2"  # Must match local model!
     )
-    print("✅ Knowledge Base built. AI can now 'read' the manual.")
-    return vector_db
+    
+    # 2. Connect to the Pinecone database you already filled
+    vectorstore = PineconeVectorStore(
+        index_name="vulcan-manuals",
+        embedding=embeddings,
+        pinecone_api_key=os.getenv("PINECONE_API_KEY")
+    )
+    
+    return vectorstore
